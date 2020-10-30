@@ -10,11 +10,29 @@ import (
 )
 
 type Client struct {
-	APIKey string
+	APIKey         string
+	OrganizationID string
 }
 
-type GetDevicesInput struct {
-	OrgID string
+type GetOrganizationDevicesInput struct {
+	OrganizationID string
+}
+
+type GetOrganizationDevicesOutput struct {
+	Name                   string   `json:"name"`
+	Serial                 string   `json:"serial"`
+	Mac                    string   `json:"mac"`
+	NetworkID              string   `json:"networkId"`
+	Model                  string   `json:"model"`
+	Address                string   `json:"address"`
+	Lat                    float64  `json:"lat"`
+	Lng                    float64  `json:"lng"`
+	Notes                  string   `json:"notes"`
+	Tags                   []string `json:"tags"`
+	LanIP                  string   `json:"lanIp"`
+	ConfigurationUpdatedAt string   `json:"configurationUpdatedAt"`
+	Firmware               string   `json:"firmware"`
+	URL                    string   `json:"url"`
 }
 
 func (v *Client) GetOrganizations(ctx context.Context) ([]map[string]interface{}, diag.Diagnostics) {
@@ -37,8 +55,8 @@ func (v *Client) GetOrganizations(ctx context.Context) ([]map[string]interface{}
 	return items, nil
 }
 
-func (v *Client) GetDevices(ctx context.Context, input *GetDevicesInput) ([]map[string]interface{}, diag.Diagnostics) {
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://api.meraki.com/api/v1/%s/devices", input.OrgID), nil)
+func (v *Client) GetOrganizationDevices(ctx context.Context, input *GetOrganizationDevicesInput) ([]GetOrganizationDevicesOutput, diag.Diagnostics) {
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://api.meraki.com/api/v1/organizations/%s/devices", input.OrganizationID), nil)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
@@ -49,7 +67,7 @@ func (v *Client) GetDevices(ctx context.Context, input *GetDevicesInput) ([]map[
 		return nil, diag.FromErr(err)
 	}
 	defer r.Body.Close()
-	items := make([]map[string]interface{}, 0)
+	items := make([]GetOrganizationDevicesOutput, 0)
 	err = json.NewDecoder(r.Body).Decode(&items)
 	if err != nil {
 		return nil, diag.FromErr(err)

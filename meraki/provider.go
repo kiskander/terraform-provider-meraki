@@ -29,15 +29,10 @@ func Provider() *schema.Provider {
 				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("MERAKI_API_KEY", nil),
 			},
-			"org_id": &schema.Schema{
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
-			},
 		},
 		ResourcesMap: map[string]*schema.Resource{},
 		DataSourcesMap: map[string]*schema.Resource{
-			"meraki_organizations": dataSourceOrgs(),
+			"meraki_organizations": dataSourceOrganizations(),
 			"meraki_devices":       dataSourceDevice(),
 		},
 		ConfigureContextFunc: providerConfigure,

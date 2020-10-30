@@ -2,6 +2,7 @@ package meraki
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"time"
 
@@ -13,6 +14,11 @@ func dataSourceDevice() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceDeviceRead,
 		Schema: map[string]*schema.Schema{
+			"org_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: false,
+				Required: true,
+			},
 			"devices": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
@@ -38,7 +44,7 @@ func dataSourceDevice() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"networkid": &schema.Schema{
+						"network_id": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -54,7 +60,7 @@ func dataSourceDevice() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"lanip": &schema.Schema{
+						"lan_ip": &schema.Schema{
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -73,15 +79,35 @@ func dataSourceDeviceRead(ctx context.Context, d *schema.ResourceData, m interfa
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	orgID := d.Get("org_id").(string)
+	OrganizationID := d.Get("org_id").(string)
+	if OrganizationID == "" {
+		return diag.FromErr(errors.New("missing org_id"))
+	}
 
 	client := m.(*Client)
-	devices, diags := client.GetDevices(ctx, &GetDevicesInput{OrgID: orgID})
+	devices, diags := client.GetOrganizationDevices(ctx, &GetOrganizationDevicesInput{OrganizationID: OrganizationID})
 	if diags != nil {
 		return diags
 	}
 
-	if err := d.Set("devices", devices); err != nil {
+	items := make([]map[string]interface{}, 0)
+	for _, device := range devices {
+		items = append(items, map[string]interface{}{
+			"name":       device.Name,
+			"lat":        device.Lat,
+			"lng":        device.Lng,
+			"address":    device.Address,
+			"notes":      device.Notes,
+			"network_id": device.NetworkID,
+			"serial":     device.Serial,
+			"model":      device.Model,
+			"mac":        device.Mac,
+			"lan_ip":     device.LanIP,
+			"firmware":   device.Firmware,
+		})
+	}
+
+	if err := d.Set("devices", items); err != nil {
 		return diag.FromErr(err)
 	}
 	// always run

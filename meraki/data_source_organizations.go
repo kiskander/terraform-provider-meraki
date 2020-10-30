@@ -9,9 +9,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func dataSourceOrgs() *schema.Resource {
+func dataSourceOrganizations() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceOrgsRead,
+		ReadContext: dataSourceOrganizationsRead,
 		Schema: map[string]*schema.Schema{
 			"organizations": &schema.Schema{
 				Type:     schema.TypeList,
@@ -37,17 +37,17 @@ func dataSourceOrgs() *schema.Resource {
 	}
 }
 
-func dataSourceOrgsRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func dataSourceOrganizationsRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
 	client := m.(*Client)
-	orgs, diags := client.GetOrganizations(ctx)
+	Organizations, diags := client.GetOrganizations(ctx)
 	if diags != nil {
 		return diags
 	}
 
-	if err := d.Set("organizations", orgs); err != nil {
+	if err := d.Set("organizations", Organizations); err != nil {
 		return diag.FromErr(err)
 	}
 	// always run
