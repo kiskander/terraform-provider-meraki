@@ -8,6 +8,13 @@ terraform {
 }
 
 data "meraki_organizations" "all" {}
-output "all" {
+data "meraki_devices" "devices" {}
+
+
+output "org" {
   value = data.meraki_organizations.all
+}
+
+output "devices" {
+  value = data.meraki_devices.devices
 }
