@@ -10,8 +10,7 @@ import (
 )
 
 type Client struct {
-	APIKey         string
-	OrganizationID string
+	APIKey string
 }
 
 type GetOrganizationDevicesInput struct {
