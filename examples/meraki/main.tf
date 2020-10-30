@@ -7,7 +7,17 @@ terraform {
   }
 }
 
-data "meraki_organizations" "all" {}
-output "all" {
-  value = data.meraki_organizations.all
+# data "meraki_organizations" "all" {}
+
+data "meraki_devices" "devices" {
+  org_id = ""
+}
+
+
+# output "org" {
+#   value = data.meraki_organizations.all
+# }
+
+output "devices" {
+  value = data.meraki_devices.devices
 }
