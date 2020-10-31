@@ -34,6 +34,7 @@ func Provider() *schema.Provider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"meraki_organizations": dataSourceOrganizations(),
 			"meraki_devices":       dataSourceDevice(),
+			"meraki_org_create":    dataSourceCreateOrgs(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
